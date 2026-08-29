@@ -1,0 +1,27 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Dataset Files (Large binaries)
+*.npz
+*.tar.gz
+*.zip
+data/
+
+# Model Checkpoints & Saves
+*.sav
+*.pth
+*.pt
+*.h5
+*.keras
+
+# OS Files
+.DS_Store
+Thumbs.db
