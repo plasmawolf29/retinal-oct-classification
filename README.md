@@ -3,34 +3,37 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.6%2B%20(CUDA)-ee4c2c.svg)](https://pytorch.org/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3%2B-F7931E.svg)](https://scikit-learn.org/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-2.0%2B%20(GPU)-1182c6.svg)](https://xgboost.readthedocs.io/)
 [![Dataset](https://img.shields.io/badge/Dataset-MedMNIST%20OCTMNIST-brightgreen.svg)](https://medmnist.com/)
 [![Hardware](https://img.shields.io/badge/GPU-NVIDIA%20GTX%201660%20Ti-76B900.svg)](https://www.nvidia.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An end-to-end biomedical machine learning and computer vision project for multi-class diagnosis of retinal diseases from Optical Coherence Tomography (OCT) B-scans. This repository benchmarks classical statistical machine learning pipelines (PCA dimensionality reduction, 66-D domain feature engineering, soft voting, and multi-stage stacking) against deep regularized convolutional neural networks accelerated with CUDA GPU computing.
+An end-to-end biomedical machine learning and computer vision system for automated multi-class diagnosis of retinal diseases from Optical Coherence Tomography (OCT) B-scans. This repository benchmarks classical statistical machine learning pipelines (PCA dimensionality reduction, 66-D domain feature engineering, soft voting, multi-stage stacking, and GPU-accelerated XGBoost) against deep regularized convolutional and residual neural networks (ResNet), paired with clinical Explainable AI (Grad-CAM & SHAP).
 
 ---
 
 ## 🚀 Engineering Progression & Versioning Story
 
-This project highlights an iterative engineering progression from an initial undergraduate course submission on cloud notebooks to a locally accelerated, production-grade machine learning pipeline:
+This project illustrates an iterative engineering progression from an initial cloud-based academic course baseline to an advanced, GPU-accelerated production pipeline with explainability:
 
 ```
-┌────────────────────────────────────────┐       ┌────────────────────────────────────────┐
-│   v1.0: Academic Baseline (Colab)      │       │   v2.0: Modernized GPU Pipeline        │
-├────────────────────────────────────────┤       ├────────────────────────────────────────┤
-│ • Cloud-based execution (Google Colab) │  ───► │ • Local high-performance environment   │
-│ • Initial exploration of shallow &     │       │ • PyTorch CUDA GPU acceleration (18x)  │
-│   deep models                          │       │ • 66-D Custom Biomedical Feature Extr. │
-│ • Flat 784-D raw pixel inputs          │       │ • Fixed loop refitting & namespaces    │
-│ • Basic validation set reporting       │       │ • Full 4-class test evaluation suite   │
-│ • Baseline test accuracy: ~51%         │       │ • Test Macro ROC AUC: 0.962 (Acc: 73%) │
-└────────────────────────────────────────┘       └────────────────────────────────────────┘
+┌────────────────────────────────────────┐       ┌────────────────────────────────────────┐       ┌────────────────────────────────────────┐
+│   v1.0: Academic Baseline (Colab)      │       │   v2.0: Modernized GPU Pipeline        │       │   v3.0: ResNet, Focal Loss & XAI       │
+├────────────────────────────────────────┤       ├────────────────────────────────────────┤       ├────────────────────────────────────────┤
+│ • Cloud-based execution (Google Colab) │  ───► │ • Local GPU acceleration (18x speedup) │  ───► │ • ResidualCNN3 (ResNet skip blocks)   │
+│ • Initial exploration of shallow &     │       │ • 66-D Custom Feature Extractor        │       │ • Focal Loss (gamma=2.0) + Class Wts   │
+│   deep models                          │       │ • Bug fixes (loop refits & namespaces) │       │ • Data Augmentation & Cosine Annealing │
+│ • Flat 784-D raw pixel inputs          │       │ • Full 4-class test evaluation suite   │       │ • Test-Time Augmentation (TTA n=5)     │
+│ • Basic validation set reporting       │       │ • Test Macro ROC AUC: 0.962 (Acc: 73%) │       │ • XGBoost GPU on 66 features (0.8834)  │
+│ • Baseline test accuracy: ~51%         │       │ • Baseline test accuracy: 73.0%        │       │ • Grad-CAM & SHAP Interpretability     │
+│                                        │       │                                        │       │ • Test Accuracy: 76.50% (F1: 75.83%)   │
+└────────────────────────────────────────┘       └────────────────────────────────────────┘       └────────────────────────────────────────┘
 ```
 
-### Version Comparison in this Repository:
+### Notebook Versions in this Repository:
 * 📄 [`v1_original_colab_submission.ipynb`](./v1_original_colab_submission.ipynb): Historical baseline notebook as originally developed for the UConn Biomedical Machine Learning course on Google Colab.
 * 🚀 [`v2_improved_gpu_pipeline.ipynb`](./v2_improved_gpu_pipeline.ipynb): Modernized, GPU-accelerated pipeline featuring custom feature extraction, bug-free vectorized training, and complete diagnostic evaluations.
+* 🔬 [`v3_experimental.ipynb`](./v3_experimental.ipynb): State-of-the-art experimental pipeline featuring ResidualCNN3, Focal Loss, training data augmentation, Cosine Annealing with Warm Restarts, TTA, XGBoost GPU, Grad-CAM heatmaps, and SHAP feature importance.
 
 ---
 
@@ -40,56 +43,54 @@ Optical Coherence Tomography (OCT) is a non-invasive optical imaging modality th
 
 | Class | Pathology | Clinical Manifestation |
 | :---: | :--- | :--- |
-| **0** | **Choroidal Neovascularization (CNV)** | Neovascular vessel growth beneath the retina causing severe exudation and macular degeneration. |
+| **0** | **Choroidal Neovascularization (CNV)** | Neovascular vessel growth beneath the retina causing severe fluid exudation and macular degeneration. |
 | **1** | **Diabetic Macular Edema (DME)** | Retinal thickening and fluid accumulation resulting from diabetic retinopathy. |
 | **2** | **Drusen (DRUSEN)** | Extracellular lipid/protein deposits beneath the retinal pigment epithelium; precursor to AMD. |
 | **3** | **Normal (NORMAL)** | Healthy retinal morphology with intact foveal depression and stratified layers. |
 
 ---
 
-## 🏗️ Architectural Taxonomy
+## 📊 Comprehensive Benchmark Results (Balanced Test Set: 1,000 Scans)
 
-### Pipeline 1: Classical Machine Learning (Scikit-Learn)
-1. **Design 1A (Soft Voting Ensemble)**: Calibrated soft voting over `HistGradientBoosting`, `RandomForestClassifier`, and `KNeighborsClassifier`.
-2. **Design 1B (Dimensionality Reduction + Stacking)**: PCA retaining 90% cumulative variance (21 components) coupled with a `StackingClassifier` (Random Forest + HistGradientBoosting -> Logistic Regression meta-learner).
-3. **Design 1C (Custom Engineered Features)**: 66-dimensional domain feature extractor trained with `HistGradientBoostingClassifier`.
-4. **Design 1D (Optimized Full-Dataset HGB)**: Tuned gradient boosting on raw pixel vectors.
-
-### Pipeline 2: Deep Artificial Neural Networks (PyTorch on CUDA)
-1. **Design 2A (Deep MLP)**: Multi-layer Dense network ($66 \rightarrow 256 \rightarrow 128 \rightarrow 64 \rightarrow 4$) with Batch Normalization and Dropout.
-2. **Design 2B (Baseline CNN1)**: 3-stage Conv2D network ($32 \rightarrow 64 \rightarrow 128$ filters) with MaxPooling and Dropout.
-3. **Design 2C (Deep Regularized CNN2 - Optimal)**: Multi-block ConvNet with $3 \times 3$ kernels, Batch Normalization, Dropout ($p=0.25-0.4$), Global Average Pooling, and learning rate scheduling.
-
----
-
-## 🔬 66-D Biomedical Feature Extractor
-
-To satisfy domain interpretability requirements without deep learning, we engineered 66 morphological and spatial features:
-* **16 Regional Grid Means**: Average pixel intensity across $4 \times 4$ sub-regions ($7 \times 7$ blocks) to capture localized fluid pockets.
-* **16 Regional Grid Standard Deviations**: Sub-region intensity spread to capture local texture heterogeneity.
-* **14 Vertical Depth Projection Profiles**: Mean row intensities capturing layer stratification along the depth axis.
-* **14 Horizontal Symmetry Profiles**: Mean column intensities capturing horizontal scan symmetry.
-* **6 Global Morphological Descriptors**: Overall mean, contrast (std), central foveal intensity, central foveal std, and horizontal/vertical edge gradient energy.
-
----
-
-## 📊 Benchmark Results (Balanced Test Set: 1,000 Scans)
-
-| Pipeline | Model Architecture | Feature Representation | Test Accuracy | Balanced Accuracy | Precision (Macro) | Recall (Macro) | F1-Score (Macro) | ROC AUC (Macro OvR) |
+| Pipeline | Model Architecture | Key Engineering Upgrades | Test Accuracy | Balanced Acc | Macro Precision | Macro Recall | Macro F1-Score | Macro ROC AUC |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Pipeline 2** | **Design 2C: Deep CNN2 (Optimal)** | **28x28x1 Image (GPU)** | **73.00%** | **73.00%** | **80.85%** | **73.00%** | **69.06%** | **0.9619** |
-| **Pipeline 2** | Design 2B: Baseline CNN1 | 28x28x1 Image (GPU) | 70.80% | 70.80% | 75.70% | 70.80% | 66.84% | 0.9412 |
-| **Pipeline 2** | Design 2A: Deep MLP | 66 Custom Features (GPU) | 60.80% | 60.80% | 49.08% | 60.80% | 52.58% | 0.8925 |
-| **Pipeline 1** | Design 1D: Tuned HGB (Full) | Flat Pixels (784-D) | 57.30% | 57.30% | 63.82% | 57.30% | 49.23% | 0.8747 |
-| **Pipeline 1** | Design 1C: 66 Custom Features HGB | 66 Custom Features | 54.70% | 54.70% | 49.09% | 54.70% | 46.85% | 0.8633 |
-| **Pipeline 1** | Design 1A: Soft Voting Ensemble | Flat Pixels (784-D) | 51.30% | 51.30% | 61.23% | 51.30% | 41.16% | 0.8292 |
-| **Pipeline 1** | Design 1B: PCA (90%) + Stacking | PCA Components (21-D) | 46.30% | 46.30% | 42.76% | 46.30% | 37.27% | 0.8016 |
+| **Pipeline 2** | **Design 2D+TTA: ResidualCNN3 (Optimal)** | **ResNet + FocalLoss + Aug + Cosine + TTA (n=5)** | **76.50%** | **76.50%** | **78.59%** | **76.50%** | **75.83%** | **0.9615** |
+| **Pipeline 2** | Design 2C: Deep Regularized CNN2 | 3-Block ConvNet + BatchNorm + Plain CE | 75.90% | 75.90% | 82.21% | 75.90% | 73.89% | **0.9696** |
+| **Pipeline 2** | Design 2D: ResidualCNN3 (no TTA) | ResNet + FocalLoss + Aug + Cosine | 74.90% | 74.90% | 78.71% | 74.90% | 74.46% | 0.9585 |
+| **Pipeline 2** | Design 2B: Baseline CNN1 | 3-Stage ConvNet | 66.50% | 66.50% | 53.05% | 66.50% | 57.56% | 0.9374 |
+| **Pipeline 1** | **Design 1E: XGBoost GPU (Best ML)** | **66 Custom Features + CUDA Hist** | **59.00%** | **59.00%** | **74.88%** | **59.00%** | **51.15%** | **0.8834** |
+| **Pipeline 2** | Design 2A: Deep MLP | 66 Custom Features + BatchNorm | 58.70% | 58.70% | 66.59% | 58.70% | 50.87% | 0.8924 |
+| **Pipeline 1** | Design 1C: HGB (66 Features) | 66 Custom Features | 58.00% | 58.00% | 67.07% | 58.00% | 50.20% | 0.8755 |
+| **Pipeline 1** | Design 1D: Tuned HGB (Pixels) | Flat 784-D Pixels | 49.10% | 49.10% | 58.18% | 49.10% | 37.65% | 0.8159 |
+| **Pipeline 1** | Design 1A: Soft Voting Ensemble | HGB + RF + KNN | 47.70% | 47.70% | 58.28% | 47.70% | 35.76% | 0.8184 |
+| **Pipeline 1** | Design 1B: PCA (90%) + Stacking | PCA (21-D) + Stacking | 45.20% | 45.20% | 42.44% | 45.20% | 35.95% | 0.7932 |
 
 ---
 
-## ⚡ Hardware Acceleration & Speedup
+## 🔬 Explainable AI (XAI) & Interpretability
 
-Training all 97,477 training scans on an **NVIDIA GeForce GTX 1660 Ti** reduced training duration from **~140 seconds per epoch (on CPU) to 7.8 seconds per epoch**, delivering an **18x acceleration** with real-time `tqdm` throughput tracking (~58 it/s).
+### 1. Grad-CAM (Gradient-Weighted Class Activation Mapping)
+Grad-CAM heatmaps verify that the deep convolutional layers attend to clinically validated retinal biomarkers:
+* **CNV**: Localizes to sub-retinal fluid and choroidal neovascular membrane boundaries.
+* **DME**: Highlights intraretinal cystic fluid collections within the inner retinal layers.
+* **DRUSEN**: Concentrates on focal elevations and undulating distortions of the Retinal Pigment Epithelium (RPE).
+* **NORMAL**: Demonstrates uniform activation along continuous, stratified retinal laminations.
+
+![Grad-CAM Visualizations](./gradcam_v3.png)
+
+### 2. SHAP Feature Importance (TreeExplainer)
+SHAP value decomposition on the 66-dimensional custom feature extractor identifies the top physical drivers of classical model predictions:
+1. **Central Layer Depth Profiles (`depth_row_6`, `depth_row_7`)**: Quantify vertical optical attenuation across middle retinal layers.
+2. **Foveal Depression Metrics (`foveal_mean`, `foveal_std`)**: Measure loss of normal foveal pit architecture.
+3. **Vertical Gradient Energy (`grad_v`)**: Detects disruptions in horizontal layer stratification caused by fluid pockets and lipid deposits.
+
+![SHAP Summary Bar Plot](./shap_summary_bar.png)
+
+---
+
+## ⚡ Hardware Acceleration
+
+Training all 97,477 scans on an **NVIDIA GeForce GTX 1660 Ti** reduced single-epoch runtime from **~140 seconds on CPU to ~7.8 seconds on GPU** (18x speedup) with real-time `tqdm` throughput tracking (~58 it/s).
 
 ---
 
@@ -124,8 +125,12 @@ dataset = OCTMNIST(split='train', download=True)
 ```
 *(Note: Large binary `.npz` files are excluded from git history via `.gitignore` to maintain a lightweight repository).* 
 
-### 5. Launch the Notebook
+### 5. Launch the Notebooks
 ```bash
+# To run the v3 experimental pipeline:
+jupyter notebook v3_experimental.ipynb
+
+# To run the v2 GPU baseline pipeline:
 jupyter notebook v2_improved_gpu_pipeline.ipynb
 ```
 
@@ -135,6 +140,8 @@ jupyter notebook v2_improved_gpu_pipeline.ipynb
 
 1. **Yang, J. et al.** (2023). *MedMNIST v2 - A large-scale lightweight benchmark for 2D and 3D biomedical image classification*. Nature Scientific Data, 10(1), 41.
 2. **Kermany, D. S. et al.** (2018). *Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning*. Cell, 172(5), 1122-1131.
+3. **Selvaraju, R. R. et al.** (2017). *Grad-CAM: Visual Explanations from Deep Networks via Gradient-Based Localization*. IEEE ICCV, 618-626.
+4. **Lundberg, S. M. & Lee, S.-I.** (2017). *A Unified Approach to Interpreting Model Predictions*. NeurIPS 30.
 
 ---
 
