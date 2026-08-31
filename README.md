@@ -4,23 +4,20 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.6%2B%20(CUDA)-ee4c2c.svg)](https://pytorch.org/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3%2B-F7931E.svg)](https://scikit-learn.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.0%2B%20(GPU)-1182c6.svg)](https://xgboost.readthedocs.io/)
-[![Imbalanced-Learn](https://img.shields.io/badge/SMOTE-imbalanced--learn-orange.svg)](https://imbalanced-learn.org/)
 [![Dataset](https://img.shields.io/badge/Dataset-MedMNIST%20OCTMNIST-brightgreen.svg)](https://medmnist.com/)
 [![Hardware](https://img.shields.io/badge/GPU-NVIDIA%20GTX%201660%20Ti-76B900.svg)](https://www.nvidia.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An end-to-end biomedical machine learning and computer vision system for automated multi-class diagnosis of retinal diseases from Optical Coherence Tomography (OCT) B-scans. This repository benchmarks classical statistical machine learning pipelines against progressively advanced deep neural network architectures (Squeeze-and-Excitation ResNets, Transfer Learning EfficientNets), paired with SMOTE class balancing, post-hoc temperature scaling calibration, and clinical Explainable AI (Grad-CAM & SHAP).
+An end-to-end biomedical machine learning and computer vision system for automated multi-class diagnosis of retinal diseases from Optical Coherence Tomography (OCT) B-scans. This repository benchmarks classical statistical machine learning pipelines against progressively advanced deep neural network architectures (Squeeze-and-Excitation ResNets, Transfer Learning EfficientNets, Dual-Branch Multi-Modal Late Fusion), paired with SMOTE class balancing, post-hoc temperature scaling calibration, and clinical Explainable AI (Grad-CAM & SHAP).
 
 ---
 
 ## Engineering Progression & Version Lineage
 
-This project illustrates an iterative engineering progression from an academic baseline to a production-grade clinical AI diagnostic suite:
-
 ```
-v1.0 (Colab, CPU)    --> v2.0 (Local GPU)      --> v3.0 (GPU, Adv.)     --> v4.0 (SE-ResNet)      --> v5.0 (Production)
-Course Baseline          CUDA 18x Speedup          ResNet + Focal Loss       SE-Attn + 110-D           EfficientNet + SMOTE
-~51% Accuracy            73.0% Acc, 0.962 AUC      76.5% Acc, 0.962 AUC      83.3% Acc, 0.968 AUC      Calibration + Top-2 Acc
+v1.0 (Colab, CPU)    --> v2.0 (Local GPU)      --> v3.0 (GPU, Adv.)     --> v4.0 (SE-ResNet)      --> v5.0 (Transfer/SMOTE)  --> v6.0 (Vector B Fusion)
+Course Baseline          CUDA 18x Speedup          ResNet + Focal Loss       SE-Attn + 110-D           EfficientNet + SMOTE       Dual-Branch Late Fusion
+~51% Accuracy            73.0% Acc, 0.962 AUC      76.5% Acc, 0.962 AUC      83.3% Acc, 0.968 AUC      Calibration + Top-2 Acc    87.4% DME F1, 3.45% ECE
 ```
 
 ### Notebook Versions:
@@ -29,6 +26,7 @@ Course Baseline          CUDA 18x Speedup          ResNet + Focal Loss       SE-
 * v3: [`v3_experimental.ipynb`](./v3_experimental.ipynb) — ResidualCNN3, Focal Loss, TTA, XGBoost GPU, Grad-CAM, SHAP.
 * v4: [`v4_phase3_advanced.ipynb`](./v4_phase3_advanced.ipynb) — SE-ResNet4 with Channel Attention, 110-D GLCM/Wavelet Features, GPU Vectorized Augmentation.
 * v5: [`v5_phase4_production.ipynb`](./v5_phase4_production.ipynb) — Pretrained EfficientNet-B0 Transfer Learning, 110-D SMOTE Class Balancing, Temperature Scaling Calibration.
+* v6: [`v6_multimodal_fusion.ipynb`](./v6_multimodal_fusion.ipynb) — Vector B Dual-Branch Multi-Modal Late-Fusion Network (SE-ResNet Spatial Vision + 110-D Physical Descriptors MLP).
 
 ---
 
@@ -49,7 +47,8 @@ Optical Coherence Tomography (OCT) is a non-invasive optical imaging modality ca
 
 | Model Architecture | Phase / Ver | Top-1 Acc | Top-2 Acc | Balanced Acc | Macro F1 | CNV F1 | DME F1 | DRUSEN F1 | NORMAL F1 | Log Loss | ECE | Macro ROC AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **SE_ResidualCNN4 + TTA** | **v4 (Best)** | **83.30%** | **97.60%** | **83.30%** | **82.94%** | **87.4%** | **81.5%** | **74.2%** | **88.7%** | **0.4856** | **5.12%** | **0.9681** |
+| **SE_ResidualCNN4 + TTA** | **v4 (Best Overall)** | **83.30%** | **97.60%** | **83.30%** | **82.94%** | **87.4%** | **81.5%** | **74.2%** | **88.7%** | **0.4856** | **5.12%** | **0.9681** |
+| **Vector B MultiModal Fusion + TTA** | **v6 (New)** | **76.90%** | **94.10%** | **76.90%** | **74.36%** | **76.2%** | **87.4%** | **46.6%** | **87.3%** | **0.5658** | **3.45%** | **0.9679** |
 | **EfficientNet-B0 + Calibrated** | **v5** | **76.90%** | **91.60%** | **76.90%** | **74.92%** | **78.4%** | **86.6%** | **52.1%** | **82.6%** | **0.8457** | **9.59%** | **0.9441** |
 | **EfficientNet-B0 + TTA** | **v5** | **76.80%** | **92.40%** | **76.80%** | **74.88%** | **77.3%** | **86.9%** | **52.6%** | **82.7%** | **0.8111** | **9.74%** | **0.9495** |
 | ResidualCNN3 + TTA | v3 | 76.50% | 95.20% | 76.50% | 75.83% | 83.1% | 73.4% | 66.8% | 80.0% | 0.6210 | 7.84% | 0.9615 |
@@ -59,26 +58,21 @@ Optical Coherence Tomography (OCT) is a non-invasive optical imaging modality ca
 | XGBoost GPU 110-D Baseline | v4 | 60.00% | 82.00% | 60.00% | 52.44% | 74.0% | 64.9% | 5.4% | 65.4% | 1.0019 | 14.34% | 0.8900 |
 | XGBoost GPU 66-D | v3 | 59.00% | 82.10% | 59.00% | 51.15% | 65.2% | 44.8% | 37.1% | 57.5% | 1.0420 | 12.50% | 0.8834 |
 
-![Master Progression](./master_model_progression.png)
-
 ---
 
-## Key Engineering Discoveries & Diagnostics
+## Key Diagnostic Highlights
 
-### 1. SMOTE Solves Minority Class Collapse in Classical ML
-* In the original 110-D feature space, severe imbalance (46k Normal vs. 7.7k Drusen) caused XGBoost to collapse on Drusen (**5.4% F1**).
-* Applying **SMOTE class balancing** expanded minority synthetic representation to 46,026 samples per class, propelling **Drusen F1 from 5.4% to 36.2% (+30.8%)**, **Top-1 Accuracy to 66.7% (+6.7%)**, and **Top-2 Accuracy to 91.0% (+9.0%)**.
-* Expected Calibration Error (ECE) on XGBoost improved from **14.34% to 4.29%**.
+### 1. Vector B Multi-Modal Dual-Branch Fusion
+* Merges deep visual spatial embeddings from `SE_ResidualCNN4` ($d=128$) with domain-specific physical embeddings from the 110-D GLCM/Wavelet MLP ($d=64$).
+* Sets a new all-time benchmark on **DME F1-Score: 87.4%** (surpassing v4's 81.5% and EfficientNet's 86.9%).
+* Achieves the lowest **Expected Calibration Error: 3.45%** across all neural network configurations.
+* Reached **93.01% Validation Accuracy** and **0.9679 Macro ROC AUC**.
 
-### 2. Squeeze-and-Excitation ResNet vs. ImageNet Transfer Learning
-* **SE_ResidualCNN4 (83.3% Top-1 Acc, 97.6% Top-2 Acc, 0.9681 AUC)** outperforms off-the-shelf ImageNet models on native 28x28 OCT scans because its multi-scale channel attention is tuned specifically to low-resolution microstructural dimensions.
-* **EfficientNet-B0 transfer learning** achieves outstanding **DME F1 (86.9%)** and reaches **92.88% Validation Accuracy**, demonstrating that ImageNet spatial filters transfer effectively when upsampled to 56x56.
+![Vector B ROC & Confusion](./confusion_roc_vector_b.png)
 
-### 3. Post-Hoc Temperature Scaling Calibration
-* Neural networks trained with Cross-Entropy / Focal Loss tend to produce overconfident probability distributions.
-* Learning an optimal validation temperature ($T = 1.0742$) reduced **Log Loss from 0.8842 to 0.8457** and **ECE from 10.56% to 9.59%** without altering Top-1 ranking.
-
-![Calibration Curves](./calibration_reliability_curves.png)
+### 2. SMOTE Solves Minority Class Collapse in Classical ML
+* Without SMOTE, XGBoost collapsed on Drusen (**5.4% F1**).
+* Applying **SMOTE class balancing** expanded minority synthetic representation to 46,026 samples per class, propelling **Drusen F1 to 36.2% (+30.8%)**, **Top-1 Accuracy to 66.7% (+6.7%)**, and **Top-2 Accuracy to 91.0% (+9.0%)**.
 
 ---
 
@@ -100,8 +94,8 @@ cd retinal-oct-classification
 # Install dependencies
 pip install -r requirements.txt
 
-# Run Phase 4 Production Notebook
-jupyter notebook v5_phase4_production.ipynb
+# Run Vector B Multi-Modal Fusion Notebook
+jupyter notebook v6_multimodal_fusion.ipynb
 ```
 
 ---
@@ -110,12 +104,13 @@ jupyter notebook v5_phase4_production.ipynb
 
 1. Yang, J. et al. (2023). *MedMNIST v2 - A large-scale lightweight benchmark for 2D and 3D biomedical image classification*. Nature Scientific Data, 10(1), 41.
 2. Kermany, D. S. et al. (2018). *Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning*. Cell, 172(5), 1122-1131.
-3. Tan, M. & Le, Q. V. (2019). *EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks*. ICML 2019.
-4. Chawla, N. V. et al. (2002). *SMOTE: Synthetic Minority Over-sampling Technique*. Journal of Artificial Intelligence Research, 16, 321-357.
-5. Guo, C. et al. (2017). *On Calibration of Modern Neural Networks*. ICML 2017.
-6. Hu, J. et al. (2018). *Squeeze-and-Excitation Networks*. IEEE CVPR.
-7. Selvaraju, R. R. et al. (2017). *Grad-CAM: Visual Explanations from Deep Networks via Gradient-Based Localization*. IEEE ICCV, 618-626.
-8. Lundberg, S. M. & Lee, S.-I. (2017). *A Unified Approach to Interpreting Model Predictions*. NeurIPS 30.
+3. Hu, J. et al. (2018). *Squeeze-and-Excitation Networks*. IEEE CVPR.
+4. Haralick, R. M. et al. (1973). *Textural Features for Image Classification*. IEEE Transactions on Systems, Man, and Cybernetics.
+5. Tan, M. & Le, Q. V. (2019). *EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks*. ICML 2019.
+6. Chawla, N. V. et al. (2002). *SMOTE: Synthetic Minority Over-sampling Technique*. JAIR, 16, 321-357.
+7. Guo, C. et al. (2017). *On Calibration of Modern Neural Networks*. ICML 2017.
+8. Selvaraju, R. R. et al. (2017). *Grad-CAM: Visual Explanations from Deep Networks via Gradient-Based Localization*. IEEE ICCV.
+9. Lundberg, S. M. & Lee, S.-I. (2017). *A Unified Approach to Interpreting Model Predictions*. NeurIPS 30.
 
 ---
 
